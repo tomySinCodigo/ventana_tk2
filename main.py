@@ -146,6 +146,101 @@ class BasicButtons(tk.Frame):
             btn.bg.pressed = pressed if pressed else bg
             btn.reloadStyle()
 
+
+class KLabelMenu(tk.Label):
+    def __init__(self, parent, *args, **kw):
+        super(KLabelMenu, self).__init__(master=parent, *args, **kw)
+        self._configKLabelMenu()
+
+    def _configKLabelMenu(self):
+        ic = "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9" \
+        "hAAAARElEQVR4nGNcsWLFfwYCICIighGXHBMhzYMfMBITBvg" \
+        "AC5RWYGBg+EiG/vcwAz5GRER8IFX3ihUrKI+FUQOGhQEUJ2U" \
+        "AJYEQ7f/2AkgAAAAASUVORK5CYII="
+        self.bind("<Enter>", self.onEnter)
+        self.bind("<Leave>", self.onLeave)
+
+        self.ICO ={'data': ic}
+        self.BG = "gray40"
+        self.BG_HOVER = "gray20"
+        self.menu = tk.Menu(self, tearoff=False)
+        self.bind("<Button-1>", self.showMenu)
+        self.reloadValues()
+
+    def reloadValues(self):
+        self.data = dict(
+            text='PROGRAMA',
+            compound='left',
+            image=tk.PhotoImage(**self.ICO),
+            bg=self.BG,
+            fg='white',
+            font=('Consolas', 8, 'bold'),
+            anchor='s',
+            padx=5,
+            justify='center',
+        )
+        self.config(**self.data)
+        self.reloadMenu()
+
+    def reloadMenu(self):
+        self.addCmd('uno', lambda: print('uno'))
+
+    def showMenu(self, event:tk.Event):
+        wx, wy = self.winfo_rootx(), self.winfo_rooty()
+        lb = event.widget
+        lbh = lb.winfo_height()
+        self.menu.tk_popup(wx, wy + lbh)
+
+    def addCmd(self, name:str, cmd:callable):
+        """add command to menu"""
+        self.menu.add_command(label=name, command=cmd)
+
+    def onEnter(self, event:tk.Event):
+        self.config(bg=self.BG_HOVER)
+
+    def onLeave(self, event:tk.Event):
+        self.config(bg=self.BG)
+
+    def test(self):
+        print("test::")
+
+
+class KMenuButton(tk.Button):
+    def __init__(self, parent, *args, **kw):
+        super(KMenuButton, self).__init__(master=parent, *args, **kw)
+        self._configKMenuButton()
+
+    def _configKMenuButton(self):
+        ic = "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9" \
+        "hAAAARElEQVR4nGNcsWLFfwYCICIighGXHBMhzYMfMBITBvg" \
+        "AC5RWYGBg+EiG/vcwAz5GRER8IFX3ihUrKI+FUQOGhQEUJ2U" \
+        "AJYEQ7f/2AkgAAAAASUVORK5CYII="
+        self.ICO ={'data': ic}
+        self.data = dict(
+            text='PROGRAMA',
+            compound='left',
+            image=tk.PhotoImage(**self.ICO),
+            bg='gray',
+            fg='white',
+            font=('Consolas', 8, 'bold'),
+            anchor='s',
+            padx=5,
+            justify='center',
+            relief='flat',
+            highlightbackground='green',
+            activebackground='black',
+            activeforeground='yellow',
+        )
+        self.config(**self.data)
+
+
+
+
+
+
+
+
+
 if __name__ == '__main__':
     vn = tk.Tk()
     vn.geometry('400x220')
@@ -157,9 +252,14 @@ if __name__ == '__main__':
     # wg.setKeyName('close')
 
     # TEST BOTONES BASICOS
-    wg = BasicButtons(vn)
-    wg.grid(row=0, column=0, sticky='wens')
-    wg.setBg("gray30", "gray", "gray10")
+    # wg = BasicButtons(vn)
+    # wg.grid(row=0, column=0, sticky='wens')
+    # wg.setBg("gray30", "gray", "gray10")
+
+    # TEST MENU LABEL
+    wg = KLabelMenu(vn)
+    # wg = KMenuButton(vn)
+    wg.grid(row=0, column=0)
 
 
     vn.columnconfigure(0, weight=1)
