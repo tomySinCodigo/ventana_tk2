@@ -81,7 +81,7 @@ class KButton(tk.Button):
             bg=self.bg.normal,
             activebackground=self.bg.pressed,
             highlightbackground=self.bg.hover,
-            relief='raised',
+            relief='flat',
             padx=10,
             pady=10
         )
@@ -96,14 +96,52 @@ class KButton(tk.Button):
             raise ValueError(f"Icon '{name}' not found in dictionary.")
 
 
+class BasicButtons(tk.Frame):
+    def __init__(self, parent, **kw):
+        super(BasicButtons, self).__init__(master=parent, **kw)
+        self._configBasicButtons()
+    
+    def _configBasicButtons(self):
+        self.bt_pin = self._mkButton("lock")
+        self.bt_pin.grid(row=0, column=0, sticky='wens')
+        self.bt_min = self._mkButton("min")
+        self.bt_min.grid(row=0, column=1, sticky='wens')
+        self.bt_mm = self._mkButton("max")
+        self.bt_mm.grid(row=0, column=2, sticky='wens')
+        self.bt_close = self._mkButton("close")
+        self.bt_close.grid(row=0, column=3, sticky='wens')
+        self.bt_pin.config(command=self._changeIconPin)
+        self.ONTOP = True
+
+    def _mkButton(self, name:str) -> KButton:
+        """create a button with the given name"""
+        btn = KButton(self)
+        btn.ico.setDict(fun.getConfig('iconos'))
+        btn.setKeyName(name)
+        return btn
+    
+    def _changeIconPin(self):
+        """change icon pin"""
+        self.bt_pin.setKeyName('unlock') if self.ONTOP \
+            else self.bt_pin.setKeyName('lock')
+        self.ONTOP = not self.ONTOP
+
+
 if __name__ == '__main__':
     vn = tk.Tk()
     vn.geometry('400x220')
-    wg = KButton(vn)
+
+    # TEST BOTON CERRAR
+    # wg = KButton(vn)
+    # wg.grid(row=0, column=0, sticky='wens')
+    # wg.ico.setDict(fun.getConfig('iconos'))
+    # wg.setKeyName('close')
+
+    # TEST BOTONES BASICOS
+    wg = BasicButtons(vn)
     wg.grid(row=0, column=0, sticky='wens')
 
-    wg.ico.setDict(fun.getConfig('iconos'))
-    wg.setKeyName('close')
+
 
     vn.columnconfigure(0, weight=1)
     vn.rowconfigure(0, weight=1)
