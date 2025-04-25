@@ -82,8 +82,8 @@ class KButton(tk.Button):
             activebackground=self.bg.pressed,
             highlightbackground=self.bg.hover,
             relief='flat',
-            padx=10,
-            pady=10
+            # padx=10,
+            # pady=10
         )
 
     def setKeyName(self, name:str, suffix:str='-hover'):
@@ -102,16 +102,20 @@ class BasicButtons(tk.Frame):
         self._configBasicButtons()
     
     def _configBasicButtons(self):
+        self.bt_lr = self._mkButton("lr")
+        self.bt_lr.grid(row=0, column=0, sticky='wens')
         self.bt_pin = self._mkButton("lock")
-        self.bt_pin.grid(row=0, column=0, sticky='wens')
+        self.bt_pin.grid(row=0, column=1, sticky='wens')
         self.bt_min = self._mkButton("min")
-        self.bt_min.grid(row=0, column=1, sticky='wens')
+        self.bt_min.grid(row=0, column=2, sticky='wens')
         self.bt_mm = self._mkButton("max")
-        self.bt_mm.grid(row=0, column=2, sticky='wens')
+        self.bt_mm.grid(row=0, column=3, sticky='wens')
         self.bt_close = self._mkButton("close")
-        self.bt_close.grid(row=0, column=3, sticky='wens')
+        self.bt_close.grid(row=0, column=4, sticky='wens')
         self.bt_pin.config(command=self._changeIconPin)
+        self.bt_lr.config(command=self._changeIconLR)
         self.ONTOP = True
+        self.POS_L = True
 
     def _mkButton(self, name:str) -> KButton:
         """create a button with the given name"""
@@ -126,6 +130,21 @@ class BasicButtons(tk.Frame):
             else self.bt_pin.setKeyName('lock')
         self.ONTOP = not self.ONTOP
 
+    def _changeIconLR(self):
+        """change icon lr"""
+        self.bt_lr.setKeyName('lr-right') if self.POS_L \
+            else self.bt_lr.setKeyName('lr-hover')
+        self.POS_L = not self.POS_L
+
+    def setBg(self, bg:str, hover:str=None, pressed:str=None):
+        """set background color"""
+        self.config(bg=bg)
+        for btn in self.winfo_children():
+            btn.config(bg=bg)
+            btn.bg.normal = bg
+            btn.bg.hover = hover if hover else bg
+            btn.bg.pressed = pressed if pressed else bg
+            btn.reloadStyle()
 
 if __name__ == '__main__':
     vn = tk.Tk()
@@ -140,7 +159,7 @@ if __name__ == '__main__':
     # TEST BOTONES BASICOS
     wg = BasicButtons(vn)
     wg.grid(row=0, column=0, sticky='wens')
-
+    wg.setBg("gray30", "gray", "gray10")
 
 
     vn.columnconfigure(0, weight=1)
