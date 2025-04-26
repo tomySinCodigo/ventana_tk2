@@ -29,6 +29,7 @@ class Icon:
         }
         self.normal = 'star'
         self.hover = 'star-hover'
+        self.active = 'star-hover'
 
     @property
     def normal(self) -> tk.PhotoImage:
@@ -51,6 +52,15 @@ class Icon:
     def setDict(self, dc:dict):
         """set dictionary of icons"""
         self.d = dc
+
+    @property
+    def active(self) -> tk.PhotoImage:
+        return self.tk_active   
+    
+    @active.setter
+    def active(self, name:str):
+        icono = self.d.get(name, None)
+        self.tk_active = tk.PhotoImage(data=icono) if icono else None
         
 
 class KButton(tk.Button):
@@ -61,10 +71,7 @@ class KButton(tk.Button):
     def _configKButton(self):
         self.bg = Background()
         self.ico = Icon()
-
         self.reloadStyle()
-        self.bind("<Enter>", self.onEnter)
-        self.bind("<Leave>", self.onLeave)
 
     def onEnter(self, event:tk.Event):
         self.config(bg=self.bg.hover)
@@ -77,13 +84,13 @@ class KButton(tk.Button):
             self.config(image=self.ico.normal)
 
     def reloadStyle(self):
+        self.bind("<Enter>", self.onEnter)
+        self.bind("<Leave>", self.onLeave)
         self.config(
             bg=self.bg.normal,
             activebackground=self.bg.pressed,
             highlightbackground=self.bg.hover,
             relief='flat',
-            # padx=10,
-            # pady=10
         )
 
     def setKeyName(self, name:str, suffix:str='-hover'):
@@ -96,15 +103,63 @@ class KButton(tk.Button):
             raise ValueError(f"Icon '{name}' not found in dictionary.")
 
 
+class KButtonActive(tk.Button):
+    def __init__(self, parent, *args, **kw):
+        super(KButtonActive, self).__init__(master=parent, *args, **kw)
+        self._configKButtonActive()
+
+    def _configKButtonActive(self):
+        self.bg = Background()
+        self.ico = Icon()
+        self.bind("<Button-1>", self.onPressed)
+        self.bind("<Enter>", self.onEnter)
+        self.bind("<Leave>", self.onLeave)
+        self.setActive(active=False)
+
+    def onPressed(self, event:tk.Event):
+        self.config(bg=self.bg.pressed)
+        if self.active:self.config(image=self.ico.normal)
+        else:self.config(image=self.ico.active)
+        self.active = not self.active
+
+    def setActive(self, active:bool=True):
+        """set active state"""
+        if active:self.config(image=self.ico.active)
+        else:self.config(image=self.ico.normal)
+        self.active = active
+
+    def reloadStyle(self):
+        self.config(
+            relief='flat',
+            activebackground=self.bg.pressed,
+        )
+        self.setActive(active=self.active)
+
+    def setIconName(self, name:str, suffix:str='-active'):
+        """set key name for icon"""
+        if name in self.ico.d:
+            self.ico.normal = name
+            self.ico.active = f"{name}{suffix}"
+            self.setActive(active=self.active)
+        else:
+            raise ValueError(f"Icon '{name}' not found in dictionary.")
+        
+    def onEnter(self, event:tk.Event):
+        self.config(bg=self.bg.hover)
+
+    def onLeave(self, event:tk.Event):
+        self.config(bg=self.bg.normal)
+        
+
 class BasicButtons(tk.Frame):
     def __init__(self, parent, **kw):
         super(BasicButtons, self).__init__(master=parent, **kw)
         self._configBasicButtons()
     
     def _configBasicButtons(self):
-        self.bt_lr = self._mkButton("lr")
+        self.bt_lr = self._mkButton("lr", active=True)
         self.bt_lr.grid(row=0, column=0, sticky='wens')
-        self.bt_pin = self._mkButton("lock")
+        self.bt_pin = self._mkButton("lock", active=True)
         self.bt_pin.grid(row=0, column=1, sticky='wens')
         self.bt_min = self._mkButton("min")
         self.bt_min.grid(row=0, column=2, sticky='wens')
@@ -112,29 +167,19 @@ class BasicButtons(tk.Frame):
         self.bt_mm.grid(row=0, column=3, sticky='wens')
         self.bt_close = self._mkButton("close")
         self.bt_close.grid(row=0, column=4, sticky='wens')
-        self.bt_pin.config(command=self._changeIconPin)
-        self.bt_lr.config(command=self._changeIconLR)
-        self.ONTOP = True
-        self.POS_L = True
+        self.bt_lr.setActive(active=True)
 
-    def _mkButton(self, name:str) -> KButton:
+    def _mkButton(self, name:str, active=False) -> KButton:
         """create a button with the given name"""
-        btn = KButton(self)
-        btn.ico.setDict(fun.getConfig('iconos'))
-        btn.setKeyName(name)
+        if active:
+            btn = KButtonActive(self)
+            btn.ico.setDict(fun.getConfig('iconos'))
+            btn.setIconName(name)
+        else:
+            btn = KButton(self)
+            btn.ico.setDict(fun.getConfig('iconos'))
+            btn.setKeyName(name)
         return btn
-    
-    def _changeIconPin(self):
-        """change icon pin"""
-        self.bt_pin.setKeyName('unlock') if self.ONTOP \
-            else self.bt_pin.setKeyName('lock')
-        self.ONTOP = not self.ONTOP
-
-    def _changeIconLR(self):
-        """change icon lr"""
-        self.bt_lr.setKeyName('lr-right') if self.POS_L \
-            else self.bt_lr.setKeyName('lr-hover')
-        self.POS_L = not self.POS_L
 
     def setBg(self, bg:str, hover:str=None, pressed:str=None):
         """set background color"""
@@ -187,8 +232,7 @@ class KLabelMenu(tk.Label):
 
     def showMenu(self, event:tk.Event):
         wx, wy = self.winfo_rootx(), self.winfo_rooty()
-        lb = event.widget
-        lbh = lb.winfo_height()
+        lbh = event.widget.winfo_height()
         self.menu.tk_popup(wx, wy + lbh)
 
     def addCmd(self, name:str, cmd:callable):
@@ -201,44 +245,37 @@ class KLabelMenu(tk.Label):
     def onLeave(self, event:tk.Event):
         self.config(bg=self.BG)
 
-    def test(self):
-        print("test::")
 
+class KBarra(tk.Frame):
+    def __init__(self, parent, **kw):
+        super(KBarra, self).__init__(master=parent, **kw)
+        self._configKBarra()
 
-class KMenuButton(tk.Button):
-    def __init__(self, parent, *args, **kw):
-        super(KMenuButton, self).__init__(master=parent, *args, **kw)
-        self._configKMenuButton()
+    def _configKBarra(self):
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_columnconfigure(1, weight=1)
 
-    def _configKMenuButton(self):
-        ic = "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9" \
-        "hAAAARElEQVR4nGNcsWLFfwYCICIighGXHBMhzYMfMBITBvg" \
-        "AC5RWYGBg+EiG/vcwAz5GRER8IFX3ihUrKI+FUQOGhQEUJ2U" \
-        "AJYEQ7f/2AkgAAAAASUVORK5CYII="
-        self.ICO ={'data': ic}
-        self.data = dict(
-            text='PROGRAMA',
-            compound='left',
-            image=tk.PhotoImage(**self.ICO),
-            bg='gray',
-            fg='white',
-            font=('Consolas', 8, 'bold'),
-            anchor='s',
-            padx=5,
-            justify='center',
-            relief='flat',
-            highlightbackground='green',
-            activebackground='black',
-            activeforeground='yellow',
+        self.BG = 'gray30'
+        self.menulabel = KLabelMenu(self)
+        self.textitulo = tk.Text(
+            self, height=1, padx=6, pady=3,
+            font='Consolas 8 bold',
+            bg=self.BG, fg='white', relief='flat',
+            insertbackground='white',
         )
-        self.config(**self.data)
+        self.basicbuttons = BasicButtons(self)
+        self.menulabel.grid(row=0, column=0)
+        self.textitulo.grid(row=0, column=1, sticky='wens')
+        self.basicbuttons.grid(row=0, column=2, sticky='wens')
+        self.setBg(self.BG, hover='gray20', pressed='black')
 
-
-
-
-
-
-
+    def setBg(self, bg:str, hover:str=None, pressed:str=None):
+        """set background color"""
+        self.menulabel.BG = bg
+        # self.menulabel.reloadValues()
+        self.menulabel.config(bg=bg)
+        self.textitulo.config(bg=bg)
+        self.basicbuttons.setBg(bg, hover, pressed)
 
 
 if __name__ == '__main__':
@@ -257,9 +294,12 @@ if __name__ == '__main__':
     # wg.setBg("gray30", "gray", "gray10")
 
     # TEST MENU LABEL
-    wg = KLabelMenu(vn)
-    # wg = KMenuButton(vn)
-    wg.grid(row=0, column=0)
+    # wg = KLabelMenu(vn)
+    # wg.grid(row=0, column=0)
+
+    # TEST BARRA
+    bar = KBarra(vn)
+    bar.grid(row=0, column=0, sticky='we')
 
 
     vn.columnconfigure(0, weight=1)
