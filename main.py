@@ -276,6 +276,8 @@ class KBarra(tk.Frame):
         self.menulabel.config(bg=bg)
         self.textitulo.config(bg=bg)
         self.basicbuttons.setBg(bg, hover, pressed)
+        if hover:
+            self.menulabel.BG_HOVER = hover
 
 
 if __name__ == '__main__':
@@ -300,6 +302,7 @@ if __name__ == '__main__':
     # TEST BARRA
     bar = KBarra(vn)
     bar.grid(row=0, column=0, sticky='we')
+    bar.setBg(bg='#5b5847', hover='#12122b', pressed='#383845')
 
 
     vn.columnconfigure(0, weight=1)
