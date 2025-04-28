@@ -245,6 +245,13 @@ class KLabelMenu(tk.Label):
     def onLeave(self, event:tk.Event):
         self.config(bg=self.BG)
 
+    def setConfig(self, bg:str, hover:str, **kw):
+        self.BG = bg
+        if not hover:
+            hover = 'pink'
+        self.BG_HOVER = hover
+        self.config(bg=bg, **kw)
+
 
 class KBarra(tk.Frame):
     def __init__(self, parent, **kw):
@@ -271,13 +278,36 @@ class KBarra(tk.Frame):
 
     def setBg(self, bg:str, hover:str=None, pressed:str=None):
         """set background color"""
-        self.menulabel.BG = bg
+        # self.menulabel.BG = bg
         # self.menulabel.reloadValues()
-        self.menulabel.config(bg=bg)
+        # self.menulabel.config(bg=bg)
+        self.menulabel.setConfig(bg, hover)
         self.textitulo.config(bg=bg)
         self.basicbuttons.setBg(bg, hover, pressed)
-        if hover:
-            self.menulabel.BG_HOVER = hover
+        # if hover:
+            # self.menulabel.BG_HOVER = hover
+
+    def setConfigMenuLabel(self, bg:str, hover:str=None, **kw):
+        self.menulabel.setConfig(bg, hover, **kw)
+
+
+class KWindow(tk.Frame):
+    def __init__(self, parent, **kw):
+        super(KWindow, self).__init__(master=parent, **kw)
+        self._configKWindow()
+
+    def _configKWindow(self):
+        self.rowconfigure(0, weight=0)
+        self.columnconfigure(0, weight=1)
+        self.bar = KBarra(self)
+        self.bar.grid(row=0, column=0, sticky='we')
+
+        
+    def setWidget(self, widget:tk.Widget):
+        """set widget in window"""
+        widget.grid(row=1, column=0, sticky='wens')
+        self.rowconfigure(1, weight=1)
+
 
 
 if __name__ == '__main__':
@@ -300,9 +330,18 @@ if __name__ == '__main__':
     # wg.grid(row=0, column=0)
 
     # TEST BARRA
-    bar = KBarra(vn)
-    bar.grid(row=0, column=0, sticky='we')
-    bar.setBg(bg='#5b5847', hover='#12122b', pressed='#383845')
+    # bar = KBarra(vn)
+    # bar.grid(row=0, column=0, sticky='we')
+    # bar.setBg(bg='#5b5847', hover='#12122b', pressed='#383845')
+
+    # TEST WINDOW
+    wg = KWindow(vn)
+    wg.grid(row=0, column=0, sticky='wens')
+
+    mili = tk.Listbox(wg, height=10, bg='gray', fg='white')
+    mili.insert(0, 'uno')
+    mili.insert(1, 'dos')
+    wg.setWidget(mili)
 
 
     vn.columnconfigure(0, weight=1)
