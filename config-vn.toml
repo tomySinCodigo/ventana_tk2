@@ -23,6 +23,6 @@ hover = 'red'
 pressed = 'green'
 
 [bar.title]
-text = 'Mi PROGRAMA'
+text = 'Mi PROGRAMAcio'
 font = 'Consolas 8 bold'
 fg = 'yellow'

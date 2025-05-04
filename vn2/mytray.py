@@ -61,6 +61,10 @@ class MyTray:
     def restoreWindow(self):
         self.parent.deiconify()
 
+    def setTitle(self, title):
+        """set title of window"""
+        self.icon.title = title
+
 
 if __name__ == '__main__':
     import tkinter as tk

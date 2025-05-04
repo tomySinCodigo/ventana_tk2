@@ -42,8 +42,13 @@ class Ventana(tk.Tk):
         barbg = dbar.get('bg')
         self.bar.setBg(**barbg)
 
-    # def close(self):
-    #     self.tray.closeWindow()
+        title_cnf = dbar.get('title')
+        self.setTitle(title_cnf.get('text'))
+
+    def setTitle(self, title:str) -> None:
+        """set title of window"""
+        self.bar.setTitle(title)
+        self.tray.setTitle(title)
 
 
 

@@ -290,6 +290,9 @@ class KBarra(tk.Frame):
     def setConfigMenuLabel(self, bg:str, hover:str=None, **kw):
         self.menulabel.setConfig(bg, hover, **kw)
 
+    def setTitle(self, title:str, **kw):
+        self.menulabel.config(text=title, **kw)
+
 
 class KWindow(tk.Frame):
     def __init__(self, parent, **kw):
