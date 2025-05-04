@@ -15,7 +15,7 @@ class MyTray:
     def createImage(self, width, height=None) -> Image.Image:
         if not height:
             height = width
-        img = Image.new('RGB', (width, height), 'blue')
+        img = Image.new('RGB', (width, height), 'black')
         img_draw = ImageDraw.Draw(img)
         img_draw.ellipse((0,0,width, height),fill='orange')
         return img
@@ -82,7 +82,7 @@ if __name__ == '__main__':
             bt_close = ttk.Button(self, text='cerrar', command=self.close)
             bt_close.pack(expand=True)
 
-            self.tray = MyTray(self, image_icon="image1.png")
+            self.tray = MyTray(self, image_icon="image10.png")
             self.tray.run()
 
         def getSize(self, e=tk.Event) -> None:

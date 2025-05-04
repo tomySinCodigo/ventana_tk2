@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 import funciones as fun
 from main import KBarra
+from mytray import MyTray
 
 
 class Ventana(tk.Tk):
@@ -17,6 +18,10 @@ class Ventana(tk.Tk):
         self.rowconfigure(1, weight=1)
         self.bar = KBarra(self)
         self.bar.grid(row=0, column=0, sticky='wens')
+        self.tray = MyTray(self, image_icon="image10.png")
+        self.tray.run()
+        self.bar.basicbuttons.bt_close.config(command=self.tray.closeWindow)
+        self.bar.basicbuttons.bt_min.config(command=self.tray.minimizeWindow)
 
 
         self.reloadConfigs()
@@ -36,6 +41,9 @@ class Ventana(tk.Tk):
         dbar = fun.getConfig('bar')
         barbg = dbar.get('bg')
         self.bar.setBg(**barbg)
+
+    # def close(self):
+    #     self.tray.closeWindow()
 
 
 
