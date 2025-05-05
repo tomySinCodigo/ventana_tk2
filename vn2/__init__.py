@@ -14,6 +14,7 @@ class Ventana(tk.Tk):
         self.bind('<Configure>', self.getSize)
         # bt = ttk.Button(self, text='cerrar', command=self.destroy)
         # bt.pack(expand=True)
+
         self.columnconfigure(0, weight=1)
         self.rowconfigure(1, weight=1)
         self.bar = KBarra(self)
@@ -22,8 +23,13 @@ class Ventana(tk.Tk):
         self.tray.run()
         self.bar.basicbuttons.bt_close.config(command=self.tray.closeWindow)
         self.bar.basicbuttons.bt_min.config(command=self.tray.minimizeWindow)
+        self.bar.basicbuttons.bt_mm.config(command=self.restoreWindow)
+        self.bar.basicbuttons.bt_pin.config(command=self.onTop)
 
-
+        self.overrideredirect(True)
+        self.TOP = True
+        self.bar.basicbuttons.bt_pin.setActive(self.TOP)
+        self.onTop()
         self.reloadConfigs()
 
     def getSize(self, e=tk.Event) -> None:
@@ -50,6 +56,16 @@ class Ventana(tk.Tk):
         self.bar.setTitle(title)
         self.tray.setTitle(title)
 
+    def restoreWindow(self):
+        """restore window"""
+        std = "normal" if self.state() == "zoomed" else "zoomed"
+        self.wm_state(std)
+
+    def onTop(self):
+        """set window on top"""
+        n = 1 if self.TOP else 0
+        self.wm_attributes("-topmost", n)
+        self.TOP = not self.TOP
 
 
 if __name__ == '__main__':
