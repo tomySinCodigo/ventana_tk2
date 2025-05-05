@@ -30,6 +30,12 @@ class Ventana(tk.Tk):
         self.TOP = True
         self.bar.basicbuttons.bt_pin.setActive(self.TOP)
         self.onTop()
+
+        self.CX, self.CY = 0, 0
+        self.bind('<ButtonPress-3>', self._startMove)
+        self.bind('<ButtonRelease-1>', self._stopMove)
+        self.bind('<B3-Motion>', self._onMotion)
+
         self.reloadConfigs()
 
     def getSize(self, e=tk.Event) -> None:
@@ -66,6 +72,17 @@ class Ventana(tk.Tk):
         n = 1 if self.TOP else 0
         self.wm_attributes("-topmost", n)
         self.TOP = not self.TOP
+
+    def _startMove(self, event):
+        self.CX, self.CY = event.x, event.y
+
+    def _stopMove(self, event):
+        self.CX, self.CY = 0, 0
+
+    def _onMotion(self, event):
+        x = self.winfo_x() + (event.x - self.CX)
+        y = self.winfo_y() + (event.y - self.CY)
+        self.geometry(f"+{x}+{y}")
 
 
 if __name__ == '__main__':
