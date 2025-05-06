@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 import funciones as fun
-from main import KBarra
+from main import KBarra, KGrip
 from mytray import MyTray
 from position import Position
 
@@ -34,11 +34,12 @@ class Ventana(tk.Tk):
 
         self.CX, self.CY = 0, 0
         self.bind('<ButtonPress-3>', self._startMove)
-        self.bind('<ButtonRelease-1>', self._stopMove)
+        self.bind('<ButtonRelease-3>', self._stopMove)
         self.bind('<B3-Motion>', self._onMotion)
 
         self.pos = Position(self)
         self.bar.basicbuttons.bt_lr.config(command=self.pos.toggle)
+        self.addGrip()
 
         self.reloadConfigs()
 
@@ -67,6 +68,7 @@ class Ventana(tk.Tk):
         self.pos.mody = vc.get('mody')
         self.pos.modw = vc.get('modw')
         self.pos.modh = vc.get('modh')
+        self.grip.config(bg=bg)
 
     def setTitle(self, title:str) -> None:
         """set title of window"""
@@ -94,6 +96,13 @@ class Ventana(tk.Tk):
         x = self.winfo_x() + (event.x - self.CX)
         y = self.winfo_y() + (event.y - self.CY)
         self.geometry(f"+{x}+{y}")
+
+    def addGrip(self):
+        self.grip = KGrip(self)
+        self.grip.place(relx=0.996, rely=0.994, anchor='se')
+        self.grip.bind('<Button-1>', self.grip.startResize)
+        # self.grip.bind('<B1-Motion>', self.grip.performResize)
+        self.grip.bind('<ButtonRelease-1>', self.grip.performResize)
 
 
 if __name__ == '__main__':

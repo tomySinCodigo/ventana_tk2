@@ -294,6 +294,31 @@ class KBarra(tk.Frame):
         self.menulabel.config(text=title, **kw)
 
 
+class KGrip(tk.Frame):
+    def __init__(
+        self, parent, bg:str="red",
+        cursor="bottom_right_corner", w=10, h=15
+    ):
+        super().__init__(
+            master=parent, bg=bg, cursor=cursor,
+            width=w, height=h
+        )
+        self.parent = parent
+
+    def startResize(self, event):
+        self.start_x = event.x_root
+        self.start_y = event.y_root
+        self.start_width = self.parent.winfo_width()
+        self.start_height = self.parent.winfo_height()
+
+    def performResize(self, event):
+        delta_x = event.x_root - self.start_x
+        delta_y = event.y_root - self.start_y
+        new_width = max(self.start_width + delta_x, 100)
+        new_height = max(self.start_height + delta_y, 100)
+        self.parent.geometry(f'{new_width}x{new_height}')
+
+
 class KWindow(tk.Frame):
     def __init__(self, parent, **kw):
         super(KWindow, self).__init__(master=parent, **kw)
