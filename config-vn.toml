@@ -13,6 +13,11 @@ lr = "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAbklEQVR4nNWTwQ2AMAwDL6hjZB
 [ventana]
 size = [420, 210]
 bg = 'gray40'
+proportion = [2, 5]
+modx = 0
+mody = 4
+modw = 0
+modh = -4
 
 [bar]
 

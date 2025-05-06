@@ -3,6 +3,7 @@ from tkinter import ttk
 import funciones as fun
 from main import KBarra
 from mytray import MyTray
+from position import Position
 
 
 class Ventana(tk.Tk):
@@ -36,6 +37,9 @@ class Ventana(tk.Tk):
         self.bind('<ButtonRelease-1>', self._stopMove)
         self.bind('<B3-Motion>', self._onMotion)
 
+        self.pos = Position(self)
+        self.bar.basicbuttons.bt_lr.config(command=self.pos.toggle)
+
         self.reloadConfigs()
 
     def getSize(self, e=tk.Event) -> None:
@@ -56,6 +60,13 @@ class Ventana(tk.Tk):
 
         title_cnf = dbar.get('title')
         self.setTitle(title_cnf.get('text'))
+
+        n1, n2 = vc.get('proportion')
+        self.pos.sz = n1/n2
+        self.pos.modx = vc.get('modx')
+        self.pos.mody = vc.get('mody')
+        self.pos.modw = vc.get('modw')
+        self.pos.modh = vc.get('modh')
 
     def setTitle(self, title:str) -> None:
         """set title of window"""
